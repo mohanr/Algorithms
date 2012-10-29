@@ -11,7 +11,7 @@ import java.io.StringWriter;
  */
 public class NodeStack {
 
-    Node NIL;
+    public Node NIL;
 
 
     {
@@ -24,7 +24,7 @@ public class NodeStack {
 
     Node currentNode,prevNode;
 
-    Node bottomMostnode;
+    public Node bottomMostnode;
 
     int level;
 

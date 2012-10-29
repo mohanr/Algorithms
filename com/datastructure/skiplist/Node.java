@@ -5,9 +5,9 @@ package com.datastructure.skiplist;
  * Date: 10/21/12
  * Time: 1:19 PM
 */
-class Node {
+public class Node {
 
     Node next, prev, forward, backward;
 
-    Double value;
+    public Double value;
 }

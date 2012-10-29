@@ -19,7 +19,7 @@ public class SkipList {
 
     private Random r = new Random();
 
-    NodeStack nodeStack = null;
+    public NodeStack nodeStack = null;
 
     {
         Node n = newList();/*Need not return reference.Already present in NodeStack*/
