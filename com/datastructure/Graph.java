@@ -24,8 +24,6 @@ public class Graph {
 
     public static final int MAXV = 1000;
 
-    private static final String EMPTY_STRING = "";
-
     EdgeNode[] edges = new EdgeNode[MAXV+1]; /* adjacency info */
 
     int[] degree = new int[MAXV+1]; /* outdegree of each vertex */
