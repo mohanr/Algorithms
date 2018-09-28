@@ -67,22 +67,21 @@ public class Graph {
             details = line.toCharArray();
             System.out.printf( "%d %d", Character.digit(details[0],10),Character.digit(details[2],10));
             insertEdge(Character.digit(details[0],10),
-                       Character.digit(details[2],10),
-                       true);
-            vertices ++;
+                    Character.digit(details[2],10),
+                    true);
         }
     }
 
     private void printGraph(){
         EdgeNode temporary;
-        System.out.println( "Size of vertices is " + vertices);
+        System.out.println( "Size of edges is " + countEdges);
 
-        for( int i = 1 ; i <=  vertices ; i ++){
+        for( int i = 1 ; i <=  countEdges ; i ++){
             temporary = edges[i];
             while(temporary != null){
                 System.out.println( temporary.adjacencyInfo);
                 temporary = temporary.next;
-            }
+            }e
         }
     }
 
