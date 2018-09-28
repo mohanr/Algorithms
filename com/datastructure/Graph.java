@@ -81,7 +81,7 @@ public class Graph {
             while(temporary != null){
                 System.out.println( temporary.adjacencyInfo);
                 temporary = temporary.next;
-            }e
+            }
         }
     }
 
