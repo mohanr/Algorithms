@@ -1,0 +1,4 @@
+(library
+(name bloomfilter)
+ (libraries base batteries)
+)

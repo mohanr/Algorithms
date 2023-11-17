@@ -1,0 +1,5 @@
+(library
+ (name bloomfilter_test)
+ (libraries bloomfilter)
+ (inline_tests)
+ (preprocess (pps ppx_inline_test ppx_assert ppx_expect)))

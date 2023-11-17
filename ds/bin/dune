@@ -1,0 +1,4 @@
+(executable
+ (public_name ds)
+ (name main)
+ )
