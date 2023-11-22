@@ -1,3 +1,5 @@
+open Bloomfilter
+
 let string_to_print_list s =
 
   let str = s |> String.to_seq |> List.of_seq in
@@ -12,33 +14,33 @@ let string_to_int_list s =
   List.map (fun c -> Int32.of_int c) int_list
 
 let%expect_test _=
-  let hash = Bloomfilter.Ds.jenkins (string_to_int_list "Hello") in
+  let hash = Bloomfilter.jenkins (string_to_int_list "Hello") in
   Printf.printf "%d\n" (Int32.to_int  hash);
   [%expect {| 1901914092 |}]
 
 
 let%expect_test "hash" =
-  let empty_list() : 'hf Bloomfilter.Ds.t = ref None in
+  let empty_list() : 'hf Bloomfilter.t = ref None in
   let l = empty_list() in
-  let hf = Bloomfilter.Ds.insert_hashfunc l Bloomfilter.Ds.jenkins in
+  let hf = Bloomfilter.insert_hashfunc l Bloomfilter.jenkins in
   let hash = hf.value (string_to_int_list "Hello") in
   Printf.printf "%d\n" (Int32.to_int  hash);
   [%expect {| 1901914092 |}]
 
 let%expect_test "bitset" =
-  let empty_list() : 'hf Bloomfilter.Ds.t = ref None in
+  let empty_list() : 'hf Bloomfilter.t = ref None in
   let l = empty_list() in
-  let hf = Bloomfilter.Ds.insert_hashfunc l Bloomfilter.Ds.jenkins in
-  let bit = Bloomfilter.Ds.set_indices (Bloomfilter.Ds.create_filter 9) "Hello" hf.value
+  let hf = Bloomfilter.insert_hashfunc l Bloomfilter.jenkins in
+  let bit = Bloomfilter.set_indices (Bloomfilter.create_filter 9) "Hello" hf.value
   in
   Batteries.BitSet.print (BatInnerIO.output_channel stdout) bit ;
   [%expect {| 0000000000001000 |}]
 
 let%expect_test "bitget" =
-  let empty_list() : 'hf Bloomfilter.Ds.t = ref None in
+  let empty_list() : 'hf Bloomfilter.t = ref None in
   let l = empty_list() in
-  let hf = Bloomfilter.Ds.insert_hashfunc l Bloomfilter.Ds.jenkins in
-  let bit = Bloomfilter.Ds.get_indices (Bloomfilter.Ds.create_filter 9) "Hello" hf.value in
+  let hf = Bloomfilter.insert_hashfunc l Bloomfilter.jenkins in
+  let bit = Bloomfilter.get_indices (Bloomfilter.create_filter 9) "Hello" hf.value in
   Printf.printf "%s\n" (string_of_bool bit);
   [%expect {| true |}]
 
