@@ -32,18 +32,15 @@ let%expect_test _=
   Printf.printf  "%s" (string_of_bool (check_splay_tree insert));
   [%expect {| false |}]
 
+let%expect_test _=
+   Bloomfilter__Splaytree.print_sTree Bloomfilter__.Splaytree.insert 0;
+  [%expect {|
+      3
+    2
+      1 |}]
 
 
-(* void check_sTree(sTree* t){ *)
-(*     /* check the value of sTree node, make sure all values are correct in the sTree */ *)
-(*                                                                           if (t==NULL) *)
-(*                                                                               return; *)
-(*                                                                             assert(node_value(t) == node_value(t->left)+node_value(t->right)+1); *)
-(*                                                                             if (t->left != NULL) *)
-(*                                                                                 check_sTree(t->left); *)
-(*                                                                               if (t->right != NULL) *)
-(*                                                                                   check_sTree(t->right); *)
-(* } *)
+
 (*     int splay_main() { *)
 (*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
 (*                                                     /* insert some stuff into it, and then delete it                        */ *)

@@ -6,12 +6,30 @@ let node_value n =
   match n with
   |Leaf ->  0
   | Node {value; _}-> value
+
 let insert=
   Node {
     value = 2;
     left = Node {value = 1; left = Leaf; right = Leaf};
     right = Node {value = 3; left = Leaf; right = Leaf}
   }
+
+let rec print_sTree (sTree : int s_tree ) (d : int) : unit =
+  match sTree with
+  |Leaf -> () 
+  | Node { left  ;value ;  right} ->
+                                   print_sTree right (d + 1);
+                                   for __i=0 to  (d - 1) do
+                                       Printf.printf "  "
+                                   done;
+                                   (* let rec loop i = *)
+                                   (*              if i < d then Printf.printf "  " *)
+                                   (*              else loop (i + 1) *)
+                                   (* in *)
+                                   (* loop 0; *)
+                                   Printf.printf "%d\n" value;
+                                   print_sTree left  (d+1) 
+  
 (* sTree * insert(key_type i, sTree * t) { *)
 (*     /* Insert i into the sTree t, unless it's already there.    */ *)
 (*     /* Return a pointer to the resulting sTree.                 */ *)
