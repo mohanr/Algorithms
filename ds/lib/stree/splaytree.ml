@@ -7,7 +7,7 @@ let node_value n =
   |Leaf ->  0
   | Node {value; _}-> value
 
-let insert=
+let insert_with_value=
   Node {
     value = 2;
     left = Node {value = 1; left = Leaf; right = Leaf};
@@ -18,51 +18,60 @@ let rec print_sTree (sTree : int s_tree ) (d : int) : unit =
   match sTree with
   |Leaf -> () 
   | Node { left  ;value ;  right} ->
-                                   print_sTree right (d + 1);
-                                   for __i=0 to  (d - 1) do
-                                       Printf.printf "  "
-                                   done;
-                                   (* let rec loop i = *)
-                                   (*              if i < d then Printf.printf "  " *)
-                                   (*              else loop (i + 1) *)
-                                   (* in *)
-                                   (* loop 0; *)
-                                   Printf.printf "%d\n" value;
-                                   print_sTree left  (d+1) 
-  
-(* sTree * insert(key_type i, sTree * t) { *)
-(*     /* Insert i into the sTree t, unless it's already there.    */ *)
-(*     /* Return a pointer to the resulting sTree.                 */ *)
-(*     sTree * new; *)
+    print_sTree right (d + 1);
+    for __i=0 to  (d - 1) do
+      Printf.printf "  "
+    done;
+    Printf.printf "%d\n" value;
+    print_sTree left  (d+1) 
+
+type 'a splay_tree = Leaf | Node of 'a node1
+and 'a node1 = { key : 'a;value : 'a; mutable left : 'a splay_tree option; mutable right : 'a splay_tree option; }
+type 'a t = 'a splay_tree option ref
+
+let rec print_splaytree (t : int splay_tree option ref) (d : int) : unit =
+  match !t with
+  | Some Leaf -> () 
+  | None -> () 
+  | Some Node {left; key=_; value; right}->
+    print_splaytree  (ref right) (d + 1);
+    for __i=0 to  (d - 1) do
+      Printf.printf "  "
+    done;
+    Printf.printf "%d\n" value;
+    print_splaytree (ref left)  (d+1) 
+
+let insert_with_key_value=
+  ref( Node {
+      key = 2;
+      value = 2;
+      left = Some (Node {key=3; value=1; left=Some (Leaf); right=Some (Leaf)});
+      right = Some (Node {key=4; value=3; left=Some (Leaf); right=Some (Leaf)})
     
-(*     new = (sTree *\) malloc (sizeof (sTree)); *)
-(*     if (new == NULL) { *)
-(*         printf("Ran out of space\n"); *)
-(*         exit(1); *)
-(*     } *)
-(*     assign_key(new, i); *)
-(*     new->value = 1; *)
-(*     if (t == NULL) { *)
-(*         new->left = new->right = NULL; *)
-(*         return new; *)
-(*     } *)
-(*     t = splay(i,t); *)
-(*     if (key_cmp(i, t->key) < 0) { *)
-(*         new->left = t->left; *)
-(*         new->right = t; *)
-(*         t->left = NULL; *)
-(*         t->value = 1 + node_value(t->right); *)
-(*     } else if (key_cmp(i, t->key) > 0) { *)
-(*         new->right = t->right; *)
-(*         new->left = t; *)
-(*         t->right = NULL; *)
-(*         t->value = 1 + node_value(t->left); *)
-(*     } else { /* We get here if it's already in the sTree */ *)
-(*         /* Don't add it again                      */ *)
-(*         free_node(new); *)
-(*         assert (t->value == 1 + node_value(t->left) + node_value(t->right)); *)
-(*         return t; *)
-(*     } *)
-(*     new->value = 1 + node_value(new->left) + node_value(new->right); *)
-(*     return new; *)
-(* } *)
+    })
+let splay i t =
+  match !t with
+  |Leaf ->  None
+  | Node { key=_; left  ;value=_ ;  right} -> 
+    match left, right with
+    | Some Node _,Some Node {left=_; key=_; value=_; right=_}->None
+    | Some Node {left; key; value=_; right},Some Leaf | Some Node {left; key; value=_; right}, _ -> 
+      if i < key then (
+        let y = left in
+        let _l = right in
+        let _right = t in
+        let left = y in 
+        left (* Return 'left' value *)
+      ) else (
+        let left = t in
+        let _right = t in 
+        let newT = left in
+        Some !newT (* Returning 'left' value wrapped in 'Some' *)
+      )
+      | Some Leaf,Some Node _-> None 
+      | Some Leaf,Some Leaf->  None
+      | _ ,Some Leaf -> None
+      | Some Leaf,None -> None
+      |(None, Some (Node _))-> None
+      |None, None ->None 
+
