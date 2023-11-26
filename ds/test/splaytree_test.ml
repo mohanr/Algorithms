@@ -33,13 +33,16 @@ let%expect_test _=
   [%expect {| false |}]
 
 let%expect_test _=
-   Bloomfilter__Splaytree.print_sTree Bloomfilter__.Splaytree.insert 0;
+   Bloomfilter__Splaytree.print_sTree Bloomfilter__.Splaytree.insert_with_value 0;
   [%expect {|
       3
     2
       1 |}]
 
 
+let%expect_test _=
+  Bloomfilter__Splaytree.print_splaytree   (ref (Bloomfilter__.Splaytree.splay 0 Bloomfilter__.Splaytree.insert_with_key_value  )) 2;
+  [%expect {| |}]
 
 (*     int splay_main() { *)
 (*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
