@@ -39,10 +39,11 @@ let%expect_test _=
     2
       1 |}]
 
-
 let%expect_test _=
-  Bloomfilter__Splaytree.print_splaytree   (ref (Bloomfilter__.Splaytree.splay 0 Bloomfilter__.Splaytree.insert_with_key_value  )) 2;
-  [%expect {| |}]
+  let tree =  Bloomfilter__.Splaytree.insert_with_key_value in
+    Bloomfilter__Splaytree.print_splaytree    (ref  (Bloomfilter__.Splaytree.splay 1  tree)) 1;
+    [%expect {|
+      2 |}]
 
 (*     int splay_main() { *)
 (*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
