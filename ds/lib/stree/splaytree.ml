@@ -33,12 +33,12 @@ let rec print_splaytree (t : int splay_tree option ref) (d : int) : unit =
   match !t with
   | Some Leaf -> () 
   | None -> () 
-  | Some Node {left; key=_; value; right}->
+  | Some Node {left; key; value=_; right}->
     print_splaytree  (ref right) (d + 1);
     for __i=0 to  (d - 1) do
       Printf.printf "  "
     done;
-    Printf.printf "%d\n" value;
+    Printf.printf "%d\n" key;
     print_splaytree (ref left)  (d+1) 
 
 let insert_with_key_value: int splay_tree option ref=
@@ -129,3 +129,46 @@ let splay (i : int ) (t : int splay_tree option ref) =
               localnode.left <-  n.right;
               localnode.right <- n.left;
               Some node
+
+
+
+let rec insert_key (k : int ) (t : int splay_tree option ref) : int splay_tree option ref=
+ match !t with
+  | None |Some Leaf ->
+    let new_node = Node { key = k; value = 0; left = None; right = None } in
+    t := Some new_node;
+    t
+  | Some tree  ->
+    let  insert_node tree =
+
+      match tree with
+      |  Node old_key ->
+        begin match old_key with
+          |  ok  ->
+            if k > ok.key then(
+              match ok.right with
+              | None | Some Leaf ->
+              let r = ref (Some (Node { key = k ;value = 0 ; right = Some Leaf; left = Some Leaf} ))in
+               ok.right <- !r;
+               t
+             | Some _r ->
+             insert_key k (ref (ok.right ))
+             )
+            else 
+            if k < ok.key then(
+              match ok.left with
+              | None ->
+               let l = ref (Some (Node { key = k ;value = 0 ; right = Some Leaf; left = Some Leaf} ))in 
+              ok.left <- !l;
+              t 
+             | Some _l ->
+             insert_key k (ref (ok.left)); 
+            )
+          else
+             t
+        end;
+     |Leaf ->t
+    in
+    insert_node tree
+
+

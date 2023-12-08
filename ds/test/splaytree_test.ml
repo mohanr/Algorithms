@@ -40,10 +40,21 @@ let%expect_test _=
       1 |}]
 
 let%expect_test _=
-  let tree =  Bloomfilter__.Splaytree.insert_with_key_value in
-    Bloomfilter__Splaytree.print_splaytree    (ref  (Bloomfilter__.Splaytree.splay 1  tree)) 1;
+  let tree =  ref None in
+  let i = Bloomfilter__.Splaytree.insert_key 6 tree in
+  let j = Bloomfilter__.Splaytree.insert_key 9 i in
+  let k = Bloomfilter__.Splaytree.insert_key 2 j in
+  let l = Bloomfilter__.Splaytree.insert_key 3 k in
+  let m = Bloomfilter__.Splaytree.insert_key 6 l in
+  let _n = Bloomfilter__.Splaytree.insert_key 16 m in
+     Bloomfilter__Splaytree.print_splaytree  tree 1; 
     [%expect {|
-      2 |}]
+        9
+      6
+              16
+            6
+          3
+        2 |}]
 
 (*     int splay_main() { *)
 (*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
