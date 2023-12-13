@@ -54,63 +54,118 @@ let insert_with_key_value: int splay_tree option ref=
         })})
     }))
 
+let get_nodekey node= 
+  match node with
+  |None -> 0
+  |Some node ->
+    match node with
+    | Leaf -> 0
+    | Node n ->  
+      match n with
+      | { key ; value = _;left  = _; right = _ } -> key
+
+
+let left_point node= 
+match node with
+  |None -> None
+  |Some node ->
+    match node with
+    | Leaf -> None
+    | Node n -> Some n 
+
+
+let splayed_tree trnode l r n=
+  Printf.printf "Exiting\n";
+  !l.right <- n.right;
+  !r.left <-  n.left;
+  match trnode with
+      | { key ; value;left; right } as t -> 
+         t.left <-  n.right;
+         t.right <- n.left;
+         print_splaytree (ref (Some (Node {key;value;left;right}))) 1
+
 let splay (i : int ) (t : int splay_tree option ref) =
+  try
   let n = { key = 0;value=0; left = None; right = None } in
   let l = ref n in
   let r = ref n in
-  let get_key node = match node with
-    | Some n -> n.key
-    | None -> 0 in
-  let  loop t =
-    match !t with
-    | None -> ()
-    | Some node ->
+    let get_key node = 
+      Printf.printf "Getting key ";
+      match node with
+      | Some y_node -> 
+        begin match y_node with
+          | { key ; value = _;left  = _; right = _ } -> key
+        end;
+      | None -> 0 in
+  let () = Printf.printf "Looping " in
+  let rec loop tr =
+    match !tr with
+    | None  -> ()
+    | Some trnode ->
       let y = ref None in
-      (* while true do *)
-       match !node with 
-        | { key = k; value=0;left = Some left_node; right = _ } as n when i < k ->
-          let left_key = get_key (Some !node )in
-          if i < left_key then (
-            y := Some left_node;
-            !node.left <- !y;
-            begin match !y with
-            | Some y_node ->
-              begin match y_node with
-              |Node r -> r.right <- !node.left;
-              | Leaf -> ()
-              end;
-            | None -> ()
-            end;
-            node := !r
-          ) else if i = k then node := !node
-              else (
-                begin match n.right with
-                  | None -> ()
-                  |  Some right ->
-                    match right with
+      match !trnode with 
+      | { key = k; value=0;left  = left_node; right = right_node } ->
+        let key = get_key (Some !trnode)  in
+        let () = Printf.printf "Key %d " key in
+          if i < key then (
+            let lkey = get_nodekey left_node  in
+            if i < lkey then (
+              y :=  left_node;
+              begin match !y with
+                | Some y_node ->
+                  begin match y_node with
                     |Node r -> 
-                      let right_key = get_key (Some r) in
-                      if i > right_key then (
-                        y := Some right;
-                        !node.right <- !y;
-                        begin match !y with
-                        | None -> ()
-                        | Some y_node ->
-                              begin match y_node with
-                                |Node _l -> r.left <- !node.left;
-                                | Leaf -> ()
-                              end;
-                        end;
-                        node := !l
-                      )
-                    | _-> ()
-                end;
+                      ref left_node := r.right;
+                      begin match r.right with
+                            | None ->() 
+                            |Some cn ->
+                              match cn with
+                              | Leaf -> ()
+                              | Node n ->  
+                                ref n := !trnode;
+                                trnode := r;
+                                loop (ref (Some trnode))
+                      end;
+                    | Leaf -> ()
+                  end;
+          | None -> splayed_tree !trnode l r n ;  raise Not_found
+              end;
+            );
+                    t := !trnode.left;
+                    r := !trnode ;
+            let rn = !r in
+            let lp = left_point rn.left in
+            ref lp := Some !trnode;
+          (* ) else if i = k then trnode := !trnode *)
+
+          ) else if i = k then( splayed_tree !trnode l r n ;raise Not_found;)
+          else if i > key then (
+            let rkey = get_nodekey right_node  in
+            if i > rkey then (
+              y :=  right_node;
+              begin match !y with
+                | Some y_node ->
+                  begin match y_node with
+                    |Node l -> 
+                      ref right_node := l.left;
+                      begin match l.left with
+                        | None ->() 
+                        |Some cn ->
+                              match cn with
+                              | Leaf -> ()
+                              | Node n ->  
+                                ref n := !trnode;
+                                trnode := l;
+                                loop (ref (Some trnode))
+                      end;
+                    | Leaf -> ()
+                  end;
+               | None -> splayed_tree !trnode l r n ;  raise Not_found
+              end;
+            );
               )
         | _ -> ()
-  (*     done *)
   in
-  l := { key = 0; value = 0; left = None; right =  !t };
-  r := !l;
   match !t with
   | None -> None
   | Some node ->
@@ -118,19 +173,9 @@ let splay (i : int ) (t : int splay_tree option ref) =
         | Leaf -> None 
         | Node root ->
           loop (ref (Some (ref root)));
-          match !t with
-          | None -> None
-          | Some node ->
-            !l.right <- n.right;
-            !r.left <-  n.left;
-            match node with
-            | Leaf -> None
-            | Node localnode ->
-              localnode.left <-  n.right;
-              localnode.right <- n.left;
-              Some node
+              Some root
 
-
+with Exit -> let () = Printf.printf "Exiting\n" in None
 
 let rec insert_key (k : int ) (t : int splay_tree option ref) : int splay_tree option ref=
  match !t with

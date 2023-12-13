@@ -41,14 +41,25 @@ let%expect_test _=
 
 let%expect_test _=
   let tree =  ref None in
+  let i = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let j = Bloomfilter__.Splaytree.insert_key 2 i in
+  let _k = Bloomfilter__.Splaytree.insert_key 3 j in
+  Bloomfilter__Splaytree.print_splaytree  tree 1; 
+  [%expect {|
+        3
+      2
+    1 |}]
+
+let%expect_test _=
+  let tree =  ref None in
   let i = Bloomfilter__.Splaytree.insert_key 6 tree in
   let j = Bloomfilter__.Splaytree.insert_key 9 i in
   let k = Bloomfilter__.Splaytree.insert_key 2 j in
   let l = Bloomfilter__.Splaytree.insert_key 3 k in
   let m = Bloomfilter__.Splaytree.insert_key 6 l in
   let _n = Bloomfilter__.Splaytree.insert_key 16 m in
-     Bloomfilter__Splaytree.print_splaytree  tree 1; 
-    [%expect {|
+  Bloomfilter__Splaytree.print_splaytree  tree 1; 
+  [%expect {|
         9
       6
               16
@@ -56,35 +67,29 @@ let%expect_test _=
           3
         2 |}]
 
-(*     int splay_main() { *)
-(*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
-(*                                                     /* insert some stuff into it, and then delete it                        */ *)
-(*                                                                                            sTree * root; *)
-(* int i; *)
-(* root = NULL;              /* the empty sTree */ *)
-(*                           for (i = 0; i < 1024; i++) { *)
-(*                               root = insert((541*i) & (1023), root); *)
-(*                               check_sTree(root); *)
-(*                             } *)
-(*                               for (i = 0; i < 1024; i++) { *)
-(*                                   root = splay_delete((541*i) & (1023), root); *)
-(*                                   check_sTree(root); *)
-(*                                 } *)
 
-(*                                   printf("root=%p\n", root); *)
-(*                                 root = insert(1, root); *)
-(*                                 check_sTree(root); *)
-(*                                 root = insert(3, root); *)
-(*                                 root = insert(5, root); *)
-(*                                 root = insert(12, root); *)
-(*                                 root = insert(8, root); *)
-(*                                 root = insert(6, root); *)
-(*                                 print_sTree(root, 3); *)
-(*                                 check_sTree(root); *)
-(*                                 root = splay_delete(2, root); *)
-(*                                 printf("\n"); *)
-(*                                 print_sTree(root, 3); *)
-(*                                 free_sTree(root); *)
+let%expect_test _=
+  let tree =  ref None in
+  let i = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let j = Bloomfilter__.Splaytree.insert_key 2 i in
+  let _k = Bloomfilter__.Splaytree.insert_key 3 j in
+  let _t = Bloomfilter__.Splaytree.splay 1 tree in
+  (* Bloomfilter__Splaytree.print_splaytree  tree 1;  *)
+  [%expect.unreachable]
+[@@expect.uncaught_exn {|
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
 
-(*                                 return (0); *)
-(* } *)
+  Not_found
+  Raised at Bloomfilter__Splaytree.splay.loop in file "lib/stree/splaytree.ml", line 141, characters 60-75
+  Called from Bloomfilter__Splaytree.splay in file "lib/stree/splaytree.ml", line 175, characters 10-38
+  Called from Bloomfilter_test__Splaytree_test.(fun) in file "test/splaytree_test.ml", line 76, characters 11-47
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19
+
+  Trailing output
+  ---------------
+  Looping Getting key Key 1 Exiting
+        3
+      2
+    1 |}]
