@@ -41,55 +41,43 @@ let%expect_test _=
 
 let%expect_test _=
   let tree =  ref None in
-  let i = Bloomfilter__.Splaytree.insert_key 1 tree in
-  let j = Bloomfilter__.Splaytree.insert_key 2 i in
-  let _k = Bloomfilter__.Splaytree.insert_key 3 j in
+  let _i = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let _j = Bloomfilter__.Splaytree.insert_key 2 tree in
+  let _k = Bloomfilter__.Splaytree.insert_key 3 tree in
   Bloomfilter__Splaytree.print_splaytree  tree 1; 
   [%expect {|
-        3
-      2
-    1 |}]
+    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
+      1
+    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
+      1
+      1 |}]
+
+
+let tree_from_node (node:int Bloomfilter__.Splaytree.node1 option): int Bloomfilter__.Splaytree.splay_tree option ref=
+  match node with
+  | None -> 
+    (ref (Some (Bloomfilter__.Splaytree.Node{ key = 0;value=0; left = None; right = None })))
+| Some n ->
+    match n with
+      | { key ; value;left; right } -> 
+        let newNode = (ref (Some (Bloomfilter__.Splaytree.Node {key;value;left;right}))) in
+        newNode
 
 let%expect_test _=
   let tree =  ref None in
-  let i = Bloomfilter__.Splaytree.insert_key 6 tree in
-  let j = Bloomfilter__.Splaytree.insert_key 9 i in
-  let k = Bloomfilter__.Splaytree.insert_key 2 j in
-  let l = Bloomfilter__.Splaytree.insert_key 3 k in
-  let m = Bloomfilter__.Splaytree.insert_key 6 l in
-  let _n = Bloomfilter__.Splaytree.insert_key 16 m in
-  Bloomfilter__Splaytree.print_splaytree  tree 1; 
-  [%expect {|
-        9
-      6
-              16
-            6
-          3
-        2 |}]
-
-
-let%expect_test _=
-  let tree =  ref None in
-  let i = Bloomfilter__.Splaytree.insert_key 1 tree in
-  let j = Bloomfilter__.Splaytree.insert_key 2 i in
-  let _k = Bloomfilter__.Splaytree.insert_key 3 j in
-  let _t = Bloomfilter__.Splaytree.splay 1 tree in
-  (* Bloomfilter__Splaytree.print_splaytree  tree 1;  *)
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
-  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-     This is strongly discouraged as backtraces are fragile.
-     Please change this test to not include a backtrace. *)
-
-  Not_found
-  Raised at Bloomfilter__Splaytree.splay.loop in file "lib/stree/splaytree.ml", line 141, characters 60-75
-  Called from Bloomfilter__Splaytree.splay in file "lib/stree/splaytree.ml", line 175, characters 10-38
-  Called from Bloomfilter_test__Splaytree_test.(fun) in file "test/splaytree_test.ml", line 76, characters 11-47
-  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19
-
-  Trailing output
-  ---------------
-  Looping Getting key Key 1 Exiting
-        3
-      2
-    1 |}]
+  let _i = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let j = Bloomfilter__.Splaytree.splay 2 tree in
+  let _k = Bloomfilter__.Splaytree.insert_key 2 (tree_from_node j) in
+  let l = Bloomfilter__.Splaytree.splay 3 tree in
+  let _m = Bloomfilter__.Splaytree.insert_key 3 (tree_from_node l)  in
+   Bloomfilter__Splaytree.print_splaytree  tree 1;  
+  [%expect{|
+    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
+      1
+    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
+      1
+    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
+      1
+    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
+      1
+      1 |}]

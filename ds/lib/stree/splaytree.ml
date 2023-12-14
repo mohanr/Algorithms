@@ -75,28 +75,29 @@ match node with
 
 
 let splayed_tree trnode l r n=
-  Printf.printf "Exiting\n";
+  Printf.printf "Printing Splayed Tree\n";
   !l.right <- n.right;
   !r.left <-  n.left;
   match trnode with
-      | { key ; value;left; right } as t -> 
-         t.left <-  n.right;
-         t.right <- n.left;
-         print_splaytree (ref (Some (Node {key;value;left;right}))) 1
+  | { key  = _; value = _;left = _; right = _ } as t -> 
+    t.left <-  n.right;
+    t.right <- n.left;
+    print_splaytree (ref (Some (Node t))) 1
 
 let splay (i : int ) (t : int splay_tree option ref) =
-  try
+  (* try *)
+
   let n = { key = 0;value=0; left = None; right = None } in
   let l = ref n in
   let r = ref n in
-    let get_key node = 
-      Printf.printf "Getting key ";
-      match node with
-      | Some y_node -> 
-        begin match y_node with
-          | { key ; value = _;left  = _; right = _ } -> key
-        end;
-      | None -> 0 in
+  let get_key node = 
+    Printf.printf "Getting key ";
+    match node with
+    | Some y_node -> 
+      begin match y_node with
+        | { key ; value = _;left  = _; right = _ } -> key
+      end;
+    | None -> 0 in
   let () = Printf.printf "Looping " in
   let rec loop tr =
     match !tr with
@@ -107,7 +108,8 @@ let splay (i : int ) (t : int splay_tree option ref) =
       | { key = k; value=0;left  = left_node; right = right_node } ->
         let key = get_key (Some !trnode)  in
         let () = Printf.printf "Key %d " key in
-          if i < key then (
+        if i < key then (
+          let () = Printf.printf "Key %d is less than %d " key i in
             let lkey = get_nodekey left_node  in
             if i < lkey then (
               y :=  left_node;
@@ -136,10 +138,13 @@ let splay (i : int ) (t : int splay_tree option ref) =
             let rn = !r in
             let lp = left_point rn.left in
             ref lp := Some !trnode;
-          (* ) else if i = k then trnode := !trnode *)
 
-          ) else if i = k then( splayed_tree !trnode l r n ;raise Not_found;)
-          else if i > key then (
+        ) else if i = k then(
+          let () = Printf.printf "Key %d is equal to %d " key i in
+          splayed_tree !trnode l r n ;())
+
+        else if i > key then (
+            let () = Printf.printf "Key %d is greater than %d " key i in
             let rkey = get_nodekey right_node  in
             if i > rkey then (
               y :=  right_node;
@@ -160,22 +165,22 @@ let splay (i : int ) (t : int splay_tree option ref) =
                       end;
                     | Leaf -> ()
                   end;
-               | None -> splayed_tree !trnode l r n ;  raise Not_found
+               | None -> splayed_tree !trnode l r n ; () 
               end;
             );
-              )
-        | _ -> ()
+          )
+      | _ -> ()
   in
   match !t with
   | None -> None
   | Some node ->
     match node with
-        | Leaf -> None 
-        | Node root ->
-          loop (ref (Some (ref root)));
-              Some root
+    | Leaf -> None 
+    | Node root ->
+      loop (ref (Some (ref root)));
+      Some root
 
-with Exit -> let () = Printf.printf "Exiting\n" in None
+  (* with Exit -> let () = Printf.printf "Exiting\n" in None *)
 
 let rec insert_key (k : int ) (t : int splay_tree option ref) : int splay_tree option ref=
  match !t with
@@ -183,10 +188,11 @@ let rec insert_key (k : int ) (t : int splay_tree option ref) : int splay_tree o
     let new_node = Node { key = k; value = 0; left = None; right = None } in
     t := Some new_node;
     t
-  | Some tree  ->
-    let  insert_node tree =
+  | Some _tree  ->
+    let splayedtree = splay k t in
+    let  insert_node splayedtree =
 
-      match tree with
+      match splayedtree with
       |  Node old_key ->
         begin match old_key with
           |  ok  ->
@@ -214,6 +220,12 @@ let rec insert_key (k : int ) (t : int splay_tree option ref) : int splay_tree o
         end;
      |Leaf ->t
     in
-    insert_node tree
+    match splayedtree with
+    | None -> 
+      insert_node (Node { key = 0;value=0; left = None; right = None })
+    | Some node  ->
+      match node with
+      | { key ; value;left; right }  -> 
+        insert_node (Node {key;value;left;right})
 
 
