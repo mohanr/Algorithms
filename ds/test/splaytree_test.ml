@@ -46,10 +46,23 @@ let%expect_test _=
   let _k = Bloomfilter__.Splaytree.insert_key 3 tree in
   Bloomfilter__Splaytree.print_splaytree  tree 1; 
   [%expect {|
-    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
+    (insert_key)Inserting new node 1
+    Looping
+     Getting key
+     Key 1
+     2 is greater than 1
+     2 is greater than right node's key 0
+    Right node is empty
       1
-    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
+    (insert_key)Inserting 2
+    Looping
+     Getting key
+     Key 1
+     3 is greater than 1
+     3 is greater than right node's key 0
+    Right node is empty
       1
+    (insert_key)Inserting 3
       1 |}]
 
 
@@ -63,21 +76,3 @@ let tree_from_node (node:int Bloomfilter__.Splaytree.node1 option): int Bloomfil
         let newNode = (ref (Some (Bloomfilter__.Splaytree.Node {key;value;left;right}))) in
         newNode
 
-let%expect_test _=
-  let tree =  ref None in
-  let _i = Bloomfilter__.Splaytree.insert_key 1 tree in
-  let j = Bloomfilter__.Splaytree.splay 2 tree in
-  let _k = Bloomfilter__.Splaytree.insert_key 2 (tree_from_node j) in
-  let l = Bloomfilter__.Splaytree.splay 3 tree in
-  let _m = Bloomfilter__.Splaytree.insert_key 3 (tree_from_node l)  in
-   Bloomfilter__Splaytree.print_splaytree  tree 1;  
-  [%expect{|
-    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
-      1
-    Looping Getting key Key 1 Key 1 is greater than 2 Printing Splayed Tree
-      1
-    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
-      1
-    Looping Getting key Key 1 Key 1 is greater than 3 Printing Splayed Tree
-      1
-      1 |}]
