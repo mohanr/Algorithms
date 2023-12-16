@@ -95,7 +95,7 @@ let splayed_tree trnode l r n=
   | { key  = _; value = _;left = _; right = _ } as t -> 
     t.left <-  n.right;
     t.right <- n.left;
-    print_splaytree (ref (Some (Node t))) 1
+    trnode
 
 let splay (i : int ) (t : int splay_tree option ref)  : int node1 option=
   (* try *)
@@ -144,43 +144,42 @@ let splay (i : int ) (t : int splay_tree option ref)  : int node1 option=
                     | Leaf -> ()
                   end;
                 );
-                | None -> splayed_tree !trnode l r n ;raise (SplaytreeException trnode) 
+                | None -> raise (SplaytreeException (ref (splayed_tree !trnode l r n) ))
               end;
-                    t := !trnode.left;
-                    r := !trnode ;
-            let rn = !r in
-            let lp = left_point rn.left in
-            ref lp := Some !trnode;
+              t := !trnode.left;
+              r := !trnode ;
+              let rn = !r in
+              let lp = left_point rn.left in
+              ref lp := Some !trnode;
 
         ) else if i = k then(
-          let () = Printf.printf "Key %d is equal to %d\n " key i in
-          splayed_tree !trnode l r n ;())
+            Printf.printf "i = k \n"; raise (SplaytreeException (ref (splayed_tree !trnode l r n )))
+        )
 
         else if i > key then (
           let () = Printf.printf "%d is greater than %d\n " i key  in
           let rkey = get_nodekey right_node  in
           let () = Printf.printf "%d is greater than right node's key %d \n" i rkey  in
-              y :=  right_node;
-              begin match !y with
-                | Some y_node ->Printf.printf "Right node is not empty\n";
+              begin match right_node with
+                | Some _r_node ->Printf.printf "Right node is not empty\n";
                 if i > rkey then (
-                  begin match y_node with
-                    |Node l -> 
-                      ref right_node := l.left;
-                      begin match l.left with
-                        | None ->() 
-                        |Some cn ->
-                              match cn with
-                              | Leaf -> ()
-                              | Node n ->  
-                                ref n := !trnode;
-                                trnode := l;
-                                loop (ref (Some trnode))
+                  let temp_y = y in
+                  y :=  right_node;
+                  begin match !temp_y with
+                    |Some y_l -> 
+                      begin match y_l with
+                        | Leaf ->() 
+                        | Node y_ln ->  
+                          ref right_node := y_ln.left;
+                          let ref_y_ln_left = tree_from_node (Some !trnode) in
+                          ref y_ln.left := !ref_y_ln_left;
+                          trnode := y_ln;
+                          loop (ref (Some trnode))
                       end;
-                    | Leaf -> ()
+                    | None -> ()
                   end;
                 );
-                | None -> Printf.printf "Right node is empty \n"; splayed_tree !trnode l r n ; raise (SplaytreeException trnode) 
+                | None -> Printf.printf "Right node is empty \n"; raise (SplaytreeException (ref (splayed_tree !trnode l r n )))
               end;
           )
       | _ -> ()

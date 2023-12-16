@@ -41,29 +41,23 @@ let%expect_test _=
 
 let%expect_test _=
   let tree =  ref None in
-  let _i = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let _i = Bloomfilter__.Splaytree.insert_key 3 tree in
   let _j = Bloomfilter__.Splaytree.insert_key 2 tree in
-  let _k = Bloomfilter__.Splaytree.insert_key 3 tree in
+  let _k = Bloomfilter__.Splaytree.insert_key 1 tree in
   Bloomfilter__Splaytree.print_splaytree  tree 1; 
   [%expect {|
-    (insert_key)Inserting new node 1
+    (insert_key)Inserting new node 3
     Looping
      Getting key
-     Key 1
-     2 is greater than 1
-     2 is greater than right node's key 0
-    Right node is empty
-      1
-    (insert_key)Inserting 2
+     Key 3
+     Key 3 is less than 2
+     (insert_key)Inserting 2
     Looping
      Getting key
-     Key 1
-     3 is greater than 1
-     3 is greater than right node's key 0
-    Right node is empty
-      1
-    (insert_key)Inserting 3
-      1 |}]
+     Key 3
+     Key 3 is less than 1
+     (insert_key)Inserting 1
+      3 |}]
 
 
 let tree_from_node (node:int Bloomfilter__.Splaytree.node1 option): int Bloomfilter__.Splaytree.splay_tree option ref=
