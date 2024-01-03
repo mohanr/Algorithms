@@ -38,26 +38,66 @@ let%expect_test _=
       3
     2
       1 |}]
+let%expect_test _=
+  let kv = Bloomfilter__.Splaytree.insert_with_key_value in
+    Bloomfilter__.Splaytree.print_splaytree  kv 1 ;
+    [%expect {|
+            4
+          2
+            3
+        4
+      1
+        3 |}]
+
+
 
 let%expect_test _=
   let tree =  ref None in
-  let _i = Bloomfilter__.Splaytree.insert_key 3 tree in
-  let _j = Bloomfilter__.Splaytree.insert_key 2 tree in
-  let _k = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 4 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 2 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 3 tree in
+
   Bloomfilter__Splaytree.print_splaytree  tree 1; 
   [%expect {|
-    (insert_key)Inserting new node 3
-    Looping
-     Getting key
-     Key 3
-     Key 3 is less than 2
-     (insert_key)Inserting 2
-    Looping
-     Getting key
-     Key 3
-     Key 3 is less than 1
-     (insert_key)Inserting 1
-      3 |}]
+    (insert_key)Inserting new node 1
+    (insert_key)Inserting 4
+    (insert_key)Inserting 2
+    (insert_key)Inserting 2
+    (insert_key)Inserting 3
+    (insert_key)Inserting 3
+    (insert_key)Inserting 3
+        4
+            3
+          2
+      1
+       |}]
+
+
+let%expect_test _=
+  let tree =  ref None in
+  let _ = Bloomfilter__.Splaytree.insert_key 5 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 9 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 13 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 11 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 1 tree in
+
+  Bloomfilter__Splaytree.print_splaytree  tree 1; 
+  [%expect {|
+    (insert_key)Inserting new node 5
+    (insert_key)Inserting 9
+    (insert_key)Inserting 13
+    (insert_key)Inserting 13
+    (insert_key)Inserting 11
+    (insert_key)Inserting 11
+    (insert_key)Inserting 11
+    (insert_key)Inserting 1
+          13
+            11
+        9
+      5
+        1
+       |}]
 
 
 let tree_from_node (node:int Bloomfilter__.Splaytree.node1 option): int Bloomfilter__.Splaytree.splay_tree option ref=
