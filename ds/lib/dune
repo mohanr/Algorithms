@@ -1,6 +1,6 @@
-(include_subdirs unqualified)
+(include_subdirs unqualified)(env (dev (flags :standard -warn-error -27-32-26)))
 (library
 (name bloomfilter)
  (libraries base batteries)
- (modules bloomfilter splaytree )
+ (modules bloomfilter splaytree splaytree_f )
 )
