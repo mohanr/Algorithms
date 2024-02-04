@@ -1,6 +1,6 @@
-(include_subdirs unqualified)(env (dev (flags :standard -warn-error -27-32-26)))
+(include_subdirs unqualified)(env (dev (flags (:standard -warn-error -69-37-34-33-27-32-26-66))))
 (library
 (name bloomfilter)
  (libraries domainslib base batteries)
- (modules bloomfilter splaytree splaytree_f rmq)
+ (modules bloomfilter splaytree splaytree_f rmq btree_variant)
 )
