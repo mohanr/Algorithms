@@ -2,5 +2,5 @@
 (library
 (name bloomfilter)
  (libraries domainslib base batteries)
- (modules bloomfilter splaytree splaytree_f rmq btree_variant)
+ (modules bloomfilter splaytree splaytree_f rmq btree btree_variant)
 )
