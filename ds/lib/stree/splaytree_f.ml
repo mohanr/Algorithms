@@ -167,22 +167,6 @@ module  SplayTree (Params : ORDERED_SET_PARAMS)
           if compare k  (keyOf(v)) = EQUAL then Some v
           else None
 
-(*   let rec add_tree  (t: tree) (e: elem) :node * bool = *)
-(*     match t with *)
-(*     |Empty -> ((Empty, e, Empty), false) *)
-(*        | Node (l,v,r) -> *)
-(*          (match compare (keyOf(v)) (keyOf(e)) with *)
-(*         | EQUAL -> ((l,e,r),true) *)
-(*         (\* | GREATER -> let (n',b) = add_tree l e  in *\) *)
-(*         (\*                    ((Node(n'),v,r),b) *\) *)
-(*         (\* | LESS ->    let (n',b) = add_tree r e in *\) *)
-(*         (\*                    ((l,v,Node(n')),b) *\) *)
-(*         | GREATER -> let ((x,y,z),b) = add_tree l e  in *)
-(*           ((Node(x,y,z),v,r),b) *)
-(*        | LESS ->    let ((x,y,z),b) = add_tree r e in *)
-(*           ((l,v,Node (x,y,z)),b) *)
-(* ) *)
-
 
   let size s tr  = s
 
@@ -193,9 +177,8 @@ module  SplayTree (Params : ORDERED_SET_PARAMS)
     let node = splay (l,v,r)  (keyOf(e)) in
     let size' = if b then size else size+1
     in
-    let _ = Printf.printf "Size %d" size' in
+    let _ = Printf.printf "Size %d\n" size' in
     ((size', ref (Node((l,v,r)))),b) and
-  (* ((size', ref (Node((l,v,r)))),b) and *)
 
    add_tree  (t: tree) (e: elem) :node * bool =
     match t with
@@ -214,13 +197,6 @@ module  SplayTree (Params : ORDERED_SET_PARAMS)
       )
 
 
-  (* let add (size,tr) (e:elem) = let *)
-  (*   ((l,v,r), b) = add_tree !tr e  in *)
-  (*   let node = splay (l,v,r)  (keyOf(e)) in *)
-  (*   let size' = if b then size else size+1 *)
-  (*   in *)
-  (*   let _ = Printf.printf "%d " size' in *)
-  (*   ((size', ref ((l,v,r))),b) *)
 
   let rec fold_forward f b k (size,tr) =
   fold_forward_tree f b k (!tr)
@@ -260,11 +236,6 @@ module IST = SplayTree( I_Params)
 
 open IST
 
-(* let ins_n  = *)
-(*   let tree = (0, ref Empty) in *)
-(*   let _i = add tree 1 in *)
-(*   let j = add tree 2 in *)
-(*   j *)
      
 let rec ins_n n  =
   if n = 0 then empty() else
@@ -272,3 +243,4 @@ let rec ins_n n  =
     match r with
       | (x,_) -> x
 
+let insert = ins_n 10;

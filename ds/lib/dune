@@ -2,5 +2,5 @@
 (library
 (name bloomfilter)
  (libraries domainslib base batteries)
- (modules dpll bloomfilter splaytree splaytree_f rmq btree btree_variant)
+ (modules dpll bloomfilter_rocksdb autograd plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
 )

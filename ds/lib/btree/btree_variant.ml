@@ -38,6 +38,7 @@ let insert (value:int) tree  =
   | BR br  ->
     match br with
     | Type1 ( a, b, c ) ->
+      let () = Printf.printf "Type1" in
       let v1_lessthan_v2 =
 
         ins a (fun k -> normal_replace (BR (Type1 (k,b,c)))) 
@@ -52,6 +53,7 @@ let insert (value:int) tree  =
       compare_normal value b v1_lessthan_v2 v1_greaterthan_v2 v1_equalto_v2
 
     | Type2( a, b, c, d, e ) -> 
+      let () = Printf.printf "Type2" in
       let v1_lessthan_v2 =
 
        ins a (fun k -> normal_replace (BR (Type2 (k,b,c,d,e)))) 
