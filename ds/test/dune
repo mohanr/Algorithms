@@ -1,6 +1,7 @@
 (library
  (name bloomfilter_test)
- (libraries bloomfilter)
+ (libraries bloomfilter eio eio_main)
  (inline_tests)
  (preprocess (pps ppx_inline_test ppx_assert ppx_expect))
- (modules plassknuth_test dpll_test bloomfilter_test splaytree_test brc_test))
+
+ (modules yfasttrie_test cyclicbarrier_test murmurhash_test plassknuth_test dpll_test bloomfilter_test splaytree_test brc_test))
