@@ -2,5 +2,5 @@
 (library
 (name bloomfilter)
  (libraries containers eio_main eio domainslib base batteries)
- (modules cyclicbarrier dpll bloomfilter_rocksdb murmurhash plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
+ (modules cyclicbarrier interval_tree dpll bloomfilter_rocksdb murmurhash plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
 )
