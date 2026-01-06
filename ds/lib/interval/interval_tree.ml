@@ -2,6 +2,7 @@ open Containers
 open Base
 open Float
 open Batteries
+open Bigarray
 
 module  Node_vector = CCVector
 
@@ -57,6 +58,44 @@ module IntervalTree = struct
                                 CCVector.sort' ( fun (_,en_d) ( _,en_d1) ->
                                                  Int.compare en_d en_d1
                                                ) vec.by_end) interval_tree.nodes in (*  Descending*)
-        ()
+      ()
+(*Reusable Stackoverflow answer which is based on *)
+(* http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightLinear *)
+let trailing_ones bitfield =
+let v = Int64.lognot bitfield in
+let f = Int64.to_float  (Int64.logand v (Int64.neg v)) in (* cast the least significant bit in v to a float *)
+let r =  Int64.sub ( Int64.shift_right (Int64.of_float f)  23) (Int64.of_string "0x7f") in
+if Int64.equal r (Int64.neg 127L)  then
+  32
+else
+  Int64.to_int r
+
+
+
+ let get_containing_data nodes point =
+  (* TODO Check if 'point' it is out of bounds *)
+  let mid = point in
+  let en_d = Int.sub (Int.of_float( log2 (Int.to_float (2 lsl (CCVector.length nodes)))))  1 in
+  Seq.of_dispenser (fun () ->
+           let rec loop_while mid =
+           if Int.(<) mid  en_d then
+                try
+                   let n = CCVector.get nodes mid in
+                   let popped =
+                        if CCVector.exists (fun ((start : int), _) -> Int.(<=) start point) n.by_start then
+                           CCVector.pop n.by_start
+                        else if CCVector.exists (fun (en_d, _) ->  Int.(<=) point en_d ) n.by_start then
+                           CCVector.pop n.by_start
+                        else None in
+                   (match popped with
+                    | Some (_,id) -> Some id
+                    | None ->
+                       let mid = (mid lor (Int.add mid  1)) land lnot (2 lsl (trailing_ones (Int64.of_int mid))) in
+                       loop_while mid
+                  )
+                with Invalid_argument _mid-> Printf.printf "Invalid_Argument"; None
+          else None
+         in loop_while mid
+         )
 
 end
