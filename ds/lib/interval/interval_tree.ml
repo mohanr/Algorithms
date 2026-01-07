@@ -8,6 +8,8 @@ module  Node_vector = CCVector
 
 type node = {
     by_start : (int * int) Node_vector.vector;
+ [@printer
+        fun fmt map -> fprintf fmt "%a" (CCVector.pp  pp_by_start)]
     by_end : (int * int) Node_vector.vector
 }
 [@@deriving show]
@@ -58,7 +60,7 @@ module IntervalTree = struct
                                 CCVector.sort' ( fun (_,en_d) ( _,en_d1) ->
                                                  Int.compare en_d en_d1
                                                ) vec.by_end) interval_tree.nodes in (*  Descending*)
-      ()
+      interval_tree.nodes
 (*Reusable Stackoverflow answer which is based on *)
 (* http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightLinear *)
 let trailing_ones bitfield =
@@ -76,7 +78,7 @@ else
   (* TODO Check if 'point' it is out of bounds *)
   let mid = point in
   let en_d = Int.sub (Int.of_float( log2 (Int.to_float (2 lsl (CCVector.length nodes)))))  1 in
-  Seq.of_dispenser (fun () ->
+  Seq.of_dispenser (fun _ -> Printf.printf "of_dispenser" ;
            let rec loop_while mid =
            if Int.(<) mid  en_d then
                 try
@@ -88,7 +90,7 @@ else
                            CCVector.pop n.by_start
                         else None in
                    (match popped with
-                    | Some (_,id) -> Some id
+                    | Some (_,id) -> Printf.printf "%d" id;Some id
                     | None ->
                        let mid = (mid lor (Int.add mid  1)) land lnot (2 lsl (trailing_ones (Int64.of_int mid))) in
                        loop_while mid
