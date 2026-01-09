@@ -1,6 +1,4 @@
 open Containers
-open Base
-open Float
 open Batteries
 open Bigarray
 
@@ -23,6 +21,8 @@ type interval_tree = {
 
 module IntervalTree = struct
 
+    let int_size  = Sys.word_size - 1
+    let umid = Array1.create int8_unsigned c_layout 1
     let new_range (m_ax : int) ranges =
       let  node =
         {
@@ -31,7 +31,7 @@ module IntervalTree = struct
         } in
       let interval_tree = {
 
-       nodes = Interval_vector.create(); (* TODO Pre-allocation ? *)
+       nodes = Interval_vector.init 32 ( fun _ -> node ); (* TODO Pre-allocation value is hard-coded *)
 
       } in
       let () = CCVector.push interval_tree.nodes node in
@@ -43,11 +43,15 @@ module IntervalTree = struct
                                failwith "range out of bounds"
                             )
                             else(
-                               let mx : int = 1 in
-                               let last: int = List.last range in
-                               let first: int = List.first range in
-                               let mid : int = Int.sub (Int.of_float( log2 (Int.to_float (last  land ( mx lsl (first lor last))))))  mx in
-                               let n = CCVector.get interval_tree.nodes mid in
+                               List.iter (fun x -> Printf.printf "%d "   x ) range;
+                               let mx = 1 in
+                               let last = List.last range in
+                               let first = List.first range in
+                               let logc2 x = (Float.of_int x) |> Stdlib.Float.log2 |> Float.floor |> Int.of_float in
+                               Array1.set umid 0 (Int.sub  (last  land ( int_size lsl (logc2(first lxor last))))  mx );
+                               let u_mid = Array1.get umid 0 in
+                               Printf.printf "mid is  %d %d First %d Last %d \n " u_mid  (last  land ( int_size lsl (logc2(first lxor last)))) first last;
+                               let n = CCVector.get interval_tree.nodes u_mid in
                                let () = CCVector.push n.by_start (first, id) in
                                CCVector.push n.by_end (last, id);
                            )
@@ -77,21 +81,26 @@ else
  let get_containing_data nodes point =
   (* TODO Check if 'point' it is out of bounds *)
   let mid = point in
-  let en_d = Int.sub (Int.of_float( log2 (Int.to_float (2 lsl (CCVector.length nodes)))))  1 in
-  Seq.of_dispenser (fun _ -> Printf.printf "of_dispenser" ;
+  let logc2 x = (Float.of_int x) |> Stdlib.Float.log2 |> Float.ceil |> Int.of_float in
+  let en_d = Int.sub ( logc2 (2 lsl (CCVector.length nodes)))  1 in
+  Printf.printf "%d %d " (logc2 (2 lsl (CCVector.length nodes))) (2 lsl (CCVector.length nodes)) ;
+  Seq.of_dispenser (fun _ ->
            let rec loop_while mid =
            if Int.(<) mid  en_d then
                 try
                    let n = CCVector.get nodes mid in
                    let popped =
-                        if CCVector.exists (fun ((start : int), _) -> Int.(<=) start point) n.by_start then
+                        if CCVector.exists (fun ((start : int), _) ->
+                              Int.(<=) start point) n.by_start then
                            CCVector.pop n.by_start
-                        else if CCVector.exists (fun (en_d, _) ->  Int.(<=) point en_d ) n.by_start then
+                        else if CCVector.exists (fun (en_d, _) ->
+                              Int.(<=) point en_d ) n.by_start then
                            CCVector.pop n.by_start
                         else None in
                    (match popped with
-                    | Some (_,id) -> Printf.printf "%d" id;Some id
-                    | None ->
+                    | Some (_,id) -> Printf.printf " ID %d " id;Some id
+                    | None -> Printf.printf " None ";
+
                        let mid = (mid lor (Int.add mid  1)) land lnot (2 lsl (trailing_ones (Int64.of_int mid))) in
                        loop_while mid
                   )

@@ -16,26 +16,30 @@ let%expect_test "Test min/max range"=
 
 let generate_point()  =
     let () = self_init() in
-    int 32
+    Random.int 32
 
 let generate_series r =
          let d = r + 1 |> fun a -> []@[a] (*  Needs a list here *)
                              |>  List.reduce ( max Int.ord ) |> (*  Find max*)
-                                  fun m ->
-                                            ((int (m + 1))--m) in (*  Start < end, Start at 1 by adding 1 to random *)
+                                  fun m -> let r = int m in
+                                           if r == 0 then
+                                            ((r + 1)--m)  (*  Start < end, Start at 1 by adding 1 to random *)
+                                           else
+                                            (r --m) in (*  Start < end, Start at 1 by adding 1 to random *)
                                                                      (*  at the beginning *)
          d
 
 let generate_range()  =
     let () = self_init() in
     let r = int 32 in
-    let series = [] in
-    let rec data x =            (*  Generate 10 ranges*)
+    let series =
+    let rec data x acc=            (*  Generate 10 ranges*)
       if x <= 10 then(
-       let _ = series@[x,(generate_series r)] in
-       data (x + 1)
-     )else series
-    in data 0
+       let acc = acc@[x,(generate_series r)] in
+       data (x + 1) acc
+     )else acc
+    in data 0 []
+    in series
 
 let%expect_test "Test generate range"=
     let () = self_init() in
@@ -51,27 +55,27 @@ let%expect_test "Test generate range"=
        [%expect {|
          (* CR expect_test: Test ran multiple times with different test outputs *)
          ============================= Output 1 / 11 =============================
-         30 31
+         25 26
          ============================= Output 2 / 11 =============================
-         24 25 26 27 28 29 30 31
+         23 24 25 26
          ============================= Output 3 / 11 =============================
-         29 30 31
+         23 24 25 26
          ============================= Output 4 / 11 =============================
-         24 25 26 27 28 29 30 31
+         10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================= Output 5 / 11 =============================
-         2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+         13 14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================= Output 6 / 11 =============================
-         27 28 29 30 31
+         11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================= Output 7 / 11 =============================
-         25 26 27 28 29 30 31
+         6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================= Output 8 / 11 =============================
-         15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+         22 23 24 25 26
          ============================= Output 9 / 11 =============================
-         28 29 30 31
+         14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================ Output 10 / 11 =============================
-         26 27 28 29 30 31
+         13 14 15 16 17 18 19 20 21 22 23 24 25 26
          ============================ Output 11 / 11 =============================
-         26 27 28 29 30 31
+         17 18 19 20 21 22 23 24 25 26
          |}];
        data (x + 1)
      )else ()
@@ -82,4 +86,17 @@ let%expect_test "Find interval"=
       (*  TODO 32 is hard-coded*)
       let node = new_range 32 (generate_range()) in
       Seq.iter print_int( fun() -> get_containing_data node (generate_point()) ());
-      [%expect {| of_dispenser |}]
+      [%expect {|
+        6 7 8 9 10 mid is  7 8 First 6 Last 10
+         1 2 3 4 5 6 7 8 9 10 mid is  7 8 First 1 Last 10
+         2 3 4 5 6 7 8 9 10 mid is  7 8 First 2 Last 10
+         8 9 10 mid is  9 10 First 8 Last 10
+         7 8 9 10 mid is  7 8 First 7 Last 10
+         1 2 3 4 5 6 7 8 9 10 mid is  7 8 First 1 Last 10
+         4 5 6 7 8 9 10 mid is  7 8 First 4 Last 10
+         4 5 6 7 8 9 10 mid is  7 8 First 4 Last 10
+         1 2 3 4 5 6 7 8 9 10 mid is  7 8 First 1 Last 10
+         2 3 4 5 6 7 8 9 10 mid is  7 8 First 2 Last 10
+         2 3 4 5 6 7 8 9 10 mid is  7 8 First 2 Last 10
+         34 17179869184 ID 3 3ID 4 4ID 0 0ID 7 7ID 6 6ID 10 10ID 9 9ID 2 2ID 8 8ID 5 5ID 1 1 None  None  None
+        |}]
