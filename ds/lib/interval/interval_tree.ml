@@ -10,13 +10,11 @@ type node = {
         fun fmt map -> fprintf fmt "%a" (CCVector.pp  pp_by_start)]
     by_end : (int * int) Node_vector.vector
 }
-[@@deriving show]
 module  Interval_vector = CCVector
 
 type interval_tree = {
     nodes : node Interval_vector.vector;
 }
-[@@deriving show]
 
 
 module IntervalTree = struct

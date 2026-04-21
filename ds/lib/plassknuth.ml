@@ -15,8 +15,9 @@ let is_space= function ' ' -> true | _ -> false
 
 let rec printlist l =
   match l with
-  | hd  ::tl ->
-  Printf.printf " %d %d %d %d\n" hd.first hd.last hd.next hd.score;
+  | _hd  ::tl ->
+  (* Printf.printf " %d %d %d %d\n" hd.first hd.last hd.next hd.score; *)
+
   printlist tl
   | []  -> ()
 
@@ -32,7 +33,7 @@ let final_state l (start, idx) =
 
 type _ Effect.t += Skipping_spaces :  (int * int ) -> unit Effect.t
 
-let parabreak l text ideal_width max_width  =
+let parabreak l text _ideal_width _max_width  =
   Printf.printf " parabreak\n";
   let start = ref 0 in
   let idx,_ =
@@ -40,7 +41,7 @@ let parabreak l text ideal_width max_width  =
                        match (is_space c, word_or_space)  with
                        | (true,true)
                            ->
-                           Printf.printf "Space at index %d, skipping\n" idx;
+                           (* Printf.printf "Space at index %d, skipping\n" idx; *)
 
                            if !start < idx then
                                 perform (Skipping_spaces (!start,idx)  );
@@ -49,7 +50,7 @@ let parabreak l text ideal_width max_width  =
                            (idx + 1,false);
                        | (true,false)
                            -> Printf.printf "No Space at index %d, skipping\n" idx;
-                           (idx + 1,false) 
+                           (idx + 1,false)
                        | (false,_)
                            ->
                            (idx + 1,true)) (0,false) text
@@ -65,7 +66,7 @@ let effective text l =
   { effc = (fun (type c) (eff1: c Effect.t) ->
       match eff1 with
       | Skipping_spaces (s,s1) -> Some (fun (k: (c,_) continuation) ->
-              Printf.printf "Skipping spaces \"%d %d\"\n" s s1;
+              (* Printf.printf "Skipping spaces \"%d %d\"\n" s s1; *)
 
               let e = {first = s; last = s1; next = -1; score = -1} in
               l := !l @ [e];
@@ -124,7 +125,7 @@ let rec plassbreak indent  idx idealwidth maxwidth =
   if (record.next + 1) = List.length !gl then(
        record.score <- 0;
   )
-  
+
 
 
 let rec loop_while line text lines idx next acc =
@@ -164,8 +165,9 @@ let  layout text idealwidth maxwidth =
         in
         let line = Bytes.of_string line in
         let _ = Bytes.set line idealwidth '+' in
-        let line = Bytes.to_string line ^ "|" in
-        Printf.printf " %s \n" line;
+        let _line = Bytes.to_string line ^ "|" in
+        (* Printf.printf " %s \n" line; *)
+
         loop entry.next !gl ""
     in
     loop 0 !gl ""

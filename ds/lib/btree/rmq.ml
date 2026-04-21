@@ -40,7 +40,7 @@ let  preprocess_a l mk =
 
          let v = Array.make ((List.length l) * ( mk   + 1)) 0 in
 
-           List.iter (fun (k, i) -> 
+           List.iter (fun (k, i) ->
 
                let () = Printf.printf "[mk %d] [k %d] [i %d]\n" mk k i in
                let ind  = indx (List.length l )  in
@@ -50,7 +50,7 @@ let  preprocess_a l mk =
                       let value = List.nth l (ind i 0) in
                       (* let () = Printf.printf "Value set is %d [k %d] [i %d]\n" value k i in *)
 
-                      let v' = Array.set v index value in
+                      let _v' = Array.set v index value in
                       Array.iter (fun elem -> Printf.printf " %d " elem) v
 
                | _ ->
@@ -59,7 +59,7 @@ let  preprocess_a l mk =
                  let p2 = Array.get v ( ind i' (k - 1)) in
                  (* let () = Printf.printf "p1 is %d p2 is %d [k %d] [i %d]\n" p1 p2 k i in *)
 
-                 let v' = Array.set v (ind i k ) ( min p1 p2) in
+                 let _v' = Array.set v (ind i k ) ( min p1 p2) in
                  Array.iter (fun elem -> Printf.printf " %d " elem) v
          ) (enum_to_list ps)
 
@@ -92,23 +92,21 @@ let  preprocess l mk =
              ) ps
 
 
-                                                               
+
 let rmq l =
   let mk = log2 (List.length l) in
   preprocess_a l mk
 
 let ps mk l =
-  let pr = 
+  let pr =
   let k = 0 --  mk
   and i = 0 -- (List.length l -1 ) in
   Enum.cartesian_product k i in
   Enum.iter (fun (k, i) -> Printf.printf "k %d i %d\n " k i) pr
   (* k *)
 
-  
-let  () = let l = [9;8;7;6;5;4;3;2;1] in
-
-  rmq l;
+(* TODO Uncomment *)
+(* let  () = let l = [9;8;7;6;5;4;3;2;1] in *)
+(*   rmq l; *)
 
 (* tuples l; *)
-
