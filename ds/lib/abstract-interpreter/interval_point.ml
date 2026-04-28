@@ -2,22 +2,23 @@ open Types
 open Containers
 
 module type ORDERED = sig
+  type inter= Types.inter
   type value
-  val value : value
   val compare : value -> value  -> int
 end
 
 
 module type IntervalPt = sig
   type elt
-  type inter
+  type inter= Types.inter
   val eq : inter -> inter -> bool
+  val lt : inter -> inter -> bool
 end
 module IntervalPoint = struct
 
 module Make (Ord : ORDERED ) : (IntervalPt with type elt := Ord.value) =
       struct
-
+        type value = int
         type inter= Types.inter
         type elt = Ord.value
    (* Repeated definition. Should belong in types.ml *)
