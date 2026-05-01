@@ -3,13 +3,22 @@ open Stdlib.Float
 module type ORDERED_FUNCTIONAL_SET = sig
 
   type inter= | Int of int | Pinf | Ninf
+  [@@deriving show]
   type interval  = |Bot |Tup of inter * inter
+  [@@deriving show]
   (* type set  *)                     (* I though we are dealing with sets *)
+  val phi : int -> inter * inter
+  val lte : interval -> interval -> bool
+  val lub : interval -> interval -> interval
+  val widen : interval -> interval ->  inter * inter
+
 end
 
 module type ORDERED_SET_PARAMS = sig
   type inter= | Int of int | Pinf | Ninf
+  [@@deriving show]
   type interval  = |Bot |Tup of inter * inter
+  [@@deriving show]
 end
 
 module  IntervalDomain(Params : ORDERED_SET_PARAMS)
@@ -18,8 +27,14 @@ module  IntervalDomain(Params : ORDERED_SET_PARAMS)
 
 
   type inter = Params.inter= | Int of int | Pinf | Ninf
+  [@@deriving show]
   type interval = Params.interval  = |Bot |Tup of inter * inter
+  [@@deriving show]
   let top = (Params.Ninf,Params.Pinf)
+
+    let phi v =
+        (* Returns an abstract element for a concrete element *)
+        Int v, Int v  (* this is the math interval [v, v] *)
 
     let norm av =
         match av with
@@ -166,9 +181,9 @@ end
 
 module I_Params = struct
   type inter= | Int of int | Pinf | Ninf
+  [@@deriving show]
   type interval  = |Bot |Tup of inter * inter
+  [@@deriving show]
 end
 
 module IST = IntervalDomain( I_Params)
-
-open IST

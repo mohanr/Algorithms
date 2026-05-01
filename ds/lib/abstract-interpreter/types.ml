@@ -1,5 +1,9 @@
 open Containers
 type inter= | Int of int | Pinf | Ninf
+  [@@deriving show]
+type interval  = |Bot |Tup of inter * inter
+  [@@deriving show]
+type mabs_t = Char.t * (inter * inter)
 module  Intervalpoint = struct
     type t = inter*inter
 
