@@ -1,0 +1,8 @@
+lib: [
+  "_build/install/default/lib/ds/META"
+  "_build/install/default/lib/ds/dune-package"
+  "_build/install/default/lib/ds/opam"
+]
+bin: [
+  "_build/install/default/bin/ds"
+]

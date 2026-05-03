@@ -38,42 +38,77 @@ let%expect_test _=
       3
     2
       1 |}]
+let%expect_test _=
+  let kv = Bloomfilter__.Splaytree.insert_with_key_value in
+    Bloomfilter__.Splaytree.print_splaytree  kv 1 ;
+    [%expect {|
+            4
+          2
+            3
+        4
+      1
+        3 |}]
+
+
 
 let%expect_test _=
-  let tree =  Bloomfilter__.Splaytree.insert_with_key_value in
-    Bloomfilter__Splaytree.print_splaytree    (ref  (Bloomfilter__.Splaytree.splay 1  tree)) 1;
-    [%expect {|
-      2 |}]
+  let tree =  ref None in
+  let _ = Bloomfilter__.Splaytree.insert_key 1 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 4 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 2 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 3 tree in
 
-(*     int splay_main() { *)
-(*     /* A sample use of these functions.  Start with the empty sTree,         */ *)
-(*                                                     /* insert some stuff into it, and then delete it                        */ *)
-(*                                                                                            sTree * root; *)
-(* int i; *)
-(* root = NULL;              /* the empty sTree */ *)
-(*                           for (i = 0; i < 1024; i++) { *)
-(*                               root = insert((541*i) & (1023), root); *)
-(*                               check_sTree(root); *)
-(*                             } *)
-(*                               for (i = 0; i < 1024; i++) { *)
-(*                                   root = splay_delete((541*i) & (1023), root); *)
-(*                                   check_sTree(root); *)
-(*                                 } *)
+  Bloomfilter__Splaytree.print_splaytree  tree 1; 
+  [%expect {|
+    (insert_key)Inserting new node 1
+    (insert_key)Inserting 4
+    (insert_key)Inserting 2
+    (insert_key)Inserting 2
+    (insert_key)Inserting 3
+    (insert_key)Inserting 3
+    (insert_key)Inserting 3
+        4
+            3
+          2
+      1
+       |}]
 
-(*                                   printf("root=%p\n", root); *)
-(*                                 root = insert(1, root); *)
-(*                                 check_sTree(root); *)
-(*                                 root = insert(3, root); *)
-(*                                 root = insert(5, root); *)
-(*                                 root = insert(12, root); *)
-(*                                 root = insert(8, root); *)
-(*                                 root = insert(6, root); *)
-(*                                 print_sTree(root, 3); *)
-(*                                 check_sTree(root); *)
-(*                                 root = splay_delete(2, root); *)
-(*                                 printf("\n"); *)
-(*                                 print_sTree(root, 3); *)
-(*                                 free_sTree(root); *)
 
-(*                                 return (0); *)
-(* } *)
+
+let%expect_test _=
+  let tree =  ref None in
+  let _ = Bloomfilter__.Splaytree.insert_key 5 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 9 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 13 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 11 tree in
+  let _ = Bloomfilter__.Splaytree.insert_key 1 tree in
+
+  Bloomfilter__Splaytree.print_splaytree  tree 1; 
+  [%expect {|
+    (insert_key)Inserting new node 5
+    (insert_key)Inserting 9
+    (insert_key)Inserting 13
+    (insert_key)Inserting 13
+    (insert_key)Inserting 11
+    (insert_key)Inserting 11
+    (insert_key)Inserting 11
+    (insert_key)Inserting 1
+          13
+            11
+        9
+      5
+        1
+       |}]
+
+
+let tree_from_node (node:int Bloomfilter__.Splaytree.node1 option): int Bloomfilter__.Splaytree.splay_tree option ref=
+  match node with
+  | None -> 
+    (ref (Some (Bloomfilter__.Splaytree.Node{ key = 0;value=0; left = None; right = None })))
+| Some n ->
+    match n with
+      | { key ; value;left; right } -> 
+        let newNode = (ref (Some (Bloomfilter__.Splaytree.Node {key;value;left;right}))) in
+        newNode
+
+
