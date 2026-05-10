@@ -1,3 +1,5 @@
+open Ppx_compare_lib.Builtin
+open Ppx_sexp_conv_lib.Conv
 
 type binaryOps =
     | Plus of char
@@ -5,7 +7,7 @@ type binaryOps =
     | Div of char
     | Neg of char
     | Mul of char
-  [@@deriving show]
+[@@deriving show ,compare, sexp]
 
 type comparisonOps =
     | Less of char
@@ -14,7 +16,7 @@ type comparisonOps =
     | Less_Eq of string
     | Great_Eq of string
     | Not_Eq of string
-  [@@deriving show]
+[@@deriving show ,compare, sexp]
 
 let operator c =
   match c with
@@ -22,20 +24,28 @@ let operator c =
      |'-' -> Minus c
      |'/' -> Div c
      | _ -> failwith "Wrong operator"
+[@@deriving show ,compare, sexp]
 
+(* Some types can be merged into 'expr*)
 type expr =
+  | Program of expr
   | BinOp of binaryOps * var * scalar
+  | BinaryOps of binaryOps * expr * expr
+  | ComparisonOps of comparisonOps * comparisonOps
   | Seq of expr * expr
   | Assign of var * expr
   | If of expr * expr * expr
   | Input of var
   | BoolExpr of comparisonOps * var *  scalar
+  | BoolExprs of comparisonOps * expr*  expr
   | While of expr * expr
+  | Vars  of char               (* Refactor*)
+  | Const of scalar (* Refactor*)
   | Skip
 and scalar =
   | Scalar of int
 and var = Var of char
-[@@deriving show]
+[@@deriving show ,compare, sexp]
 
 
  (* convenience function to turn a list into a sequence *)
