@@ -1,8 +1,58 @@
+open Batteries
 
+module type BLOOM_MATH = sig
+
+  val standard_fprate :  float -> float -> float
+  val finger_print_fprate : float -> float -> float
+  val cache_local_fprate : float -> float -> float -> float
+  val independent_probability_sum  :  float -> float -> float
+
+end
+
+module  Bloom : BLOOM_MATH = struct
+
+  let standard_fprate bits_per_key num_probes : float =
+     Float.pow (1. -. Float.exp (-. num_probes /. bits_per_key)) num_probes
+
+  let cache_local_fprate bits_per_key num_probes
+                                 cache_line_bits =
+    if bits_per_key <= 0.0 then
+      1.0
+    else
+
+    let keys_per_cache_line = cache_line_bits /. bits_per_key in
+    let keys_stddev = sqrt keys_per_cache_line in
+    let crowded_fp = standard_fprate (
+        cache_line_bits /. (keys_per_cache_line +. keys_stddev)) num_probes in
+    let uncrowded_fp = standard_fprate (
+        cache_line_bits /. (keys_per_cache_line -. keys_stddev)) num_probes in
+    (crowded_fp +. uncrowded_fp) /. 2.
+
+  let finger_print_fprate num_keys fingerprint_bits : float =
+    let inv_fingerprint_space = Float.pow 0.5 fingerprint_bits in
+    let base_estimate = num_keys *. inv_fingerprint_space in
+    if base_estimate > 0.0001 then
+      1.0 -. Float.exp (-.base_estimate)
+    else
+      base_estimate -. (base_estimate *. base_estimate *. 0.5)
+
+  let independent_probability_sum rate1 rate2 =
+    rate1 +. rate2 -. (rate1 *. rate2)
+
+end
+
+   open Bloom
    type 'bloombits filter =
    {
      bits : Batteries.BitSet.t
    }
+
+   let estimated_fprate keys bytes num_probes =
+        let bits_per_key = 8.0 *. bytes /. keys in
+        let filterRate = cache_local_fprate bits_per_key num_probes 512. in (* Cache line size is 512 *)
+        let filter_rate  = filterRate +. 0.1 /. (bits_per_key *. 0.75 +. 22.) in
+        let finger_print_rate = finger_print_fprate keys 32. in
+        independent_probability_sum filter_rate finger_print_rate
 
    let  getline (h:int32)  (num_lines:int32) : int32 =
          Int32.rem h  num_lines

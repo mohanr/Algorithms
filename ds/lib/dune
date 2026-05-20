@@ -4,5 +4,5 @@
  (inline_tests)
  (preprocess (pps ppx_inline_test ppx_compare ppx_deriving.show ppx_assert ppx_expect ppx_sexp_conv))
  (libraries core containers eio_main eio domainslib base batteries)
- (modules dom_signs stringinttuple abstractions sems_abs interval_point types tinyest intervals cyclicbarrier interval_tree dpll bloomfilter_rocksdb murmurhash plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
+ (modules intervals dom_signs sems utils stringinttuple sems_abs interval_point types tinyest abstractions cyclicbarrier interval_tree dpll bloomfilter_rocksdb murmurhash plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
 )
