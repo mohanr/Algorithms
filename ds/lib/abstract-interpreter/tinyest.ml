@@ -33,9 +33,11 @@ type expr =
   | BinaryOps of binaryOps * expr * expr
   | ComparisonOps of comparisonOps * comparisonOps
   | Seq of expr * expr
-  | Assign of var * expr
+  | Assign of var * expr(* Refactor*)
+  | Assigns of expr * expr
   | If of expr * expr * expr
-  | Input of var
+  | Input of var(* Refactor*)
+  | Inputs of expr
   | BoolExpr of comparisonOps * var *  scalar
   | BoolExprs of comparisonOps * expr*  expr
   | While of expr * expr
