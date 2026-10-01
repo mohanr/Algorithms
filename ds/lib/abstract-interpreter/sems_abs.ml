@@ -38,6 +38,15 @@ let get_scalar s m =
                 )
     |_ -> failwith "evaluate_Expr"
 
+let get_scalar_var v m =
+  match v with
+  | Var c -> (match MemoryMap.get (Char.escaped c) m with
+              | Some value ->
+                  (match value with
+                  | Const s -> s
+                  | _ -> failwith "Expecting a scalar")
+              | None -> failwith "Memory Map failure")
+
 
 let rec evaluate_Expr expr m =
   match expr with
@@ -46,24 +55,96 @@ let rec evaluate_Expr expr m =
     | BinaryOps (op, left, right) ->
                   f_binop op (evaluate_Expr left m)
                              (evaluate_Expr right m)
+    | BinOp (op, left, right) ->
+                  f_binop op (get_scalar_var left m) right
     |_ -> failwith "evaluate_Expr"
 
 let evaluate_BoolExpr expr  m : bool =
   match expr with
   | BoolExprs (op , left, right )->
-    f_cmpop op ( get_scalar left m)
-                         (get_scalar right m)
+    f_cmpop op ( evaluate_Expr left m)
+                         (evaluate_Expr right m)
+  | BoolExpr (op, left, right) ->
+    f_cmpop op (get_scalar_var left m) right
   |_ -> failwith "evaluate_BoolExpr "
 
-let filter_memory b m  =
+let filter_memory ?(res=true) b m  =
     (* TODO: why materialize this generator? *)
    let l =
-    let rec loop_while_m m i acc   =
-      if MemoryMap.cardinal m > i then
-        let a = acc @ [(evaluate_BoolExpr b m = true)] in
-        loop_while_m m (i + 1) a
-      else
-        acc
+    let rec loop_while_m m acc   =
+      match m with
+      |[] -> acc
+      |hd :: tl ->
+        let b = (evaluate_BoolExpr b hd = res) in
+        let acc = if b then  hd::acc  else acc in
+        loop_while_m tl acc
     in
-    loop_while_m m 0 []
+    loop_while_m m []
    in l
+
+let union_memories m0 m1 =
+     (* this is, of course, ridiculous *)
+  let open Stringinttuple in
+  let open Core in              (* Janestreet Core *)
+
+    (* convert everything to sets *)
+  let loop_while_m m =
+       MemoryMap.fold (fun k v acc -> Set.add acc (k,v)) m StringIntTupleSet.empty
+  in
+let set =
+  let rec loop_while_m0 m acc =
+    match m with          (* was m0 *)
+    | [] -> acc
+    | hd :: tl ->
+        loop_while_m0 tl (acc @ [loop_while_m hd])
+  in
+  loop_while_m0 m0 []
+in
+let set1 =
+  let rec loop_while_m1 m acc =
+    match m with          (* was m1 *)
+    | [] -> acc
+    | hd :: tl ->
+        loop_while_m1 tl (acc @ [loop_while_m hd])
+  in
+  loop_while_m1 m1 []
+ in
+ let s = StringIntTupleSetofSet.of_list  (set @set1) (* Assuming this is a 'union' *)
+ in let l = List.map (Set.to_list s)  ~f:(fun m ->
+           Set.fold m ~init:MemoryMap.empty ~f:( fun acc (k,v) ->
+            MemoryMap.add k v acc ) )
+ in l
+
+
+let rec evaluate_Cmd c m =
+    let open Containers in
+    let open BatRandom in
+    let update_memories var value_lambda =
+      List.map (fun m ->
+             MemoryMap.update var (Option.map (fun _ -> value_lambda m)) m
+           ) m
+    in  match c with
+          | Skip  -> m
+          | Program p -> evaluate_Cmd p m
+          | Assign (left ,right) -> update_memories (match left with
+                                                     | Var c -> Char.escaped c)
+                                     (fun m -> Const (evaluate_Expr right m))
+          | Input i -> let n = Random.full_int 101  in (* could be anything, actually *)
+                       update_memories (match i with
+                                       | Var c -> Char.escaped c)
+                                      (fun  m -> (Const (Scalar n)))
+          | Seq (a,b) -> evaluate_Cmd b (evaluate_Cmd a m)
+          | If (a,b,c)->
+                  let then_memory = evaluate_Cmd b (filter_memory a m) in
+                  let else_memory = evaluate_Cmd c (filter_memory ~res:false a m) in
+                    union_memories then_memory else_memory
+          | While (a,b) ->
+              let rec loop current accumulated =
+                match filter_memory a current with
+                | [] -> filter_memory ~res:false a accumulated
+                | pre_iter ->
+                  let after_iter = evaluate_Cmd b pre_iter in
+                  loop after_iter (union_memories accumulated after_iter)
+              in
+              loop m m
+        | _ -> failwith "Don't know how to interpret "

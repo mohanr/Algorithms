@@ -2,7 +2,49 @@
 (library
 (name bloomfilter)
  (inline_tests)
- (preprocess (pps ppx_inline_test ppx_deriving.show ppx_assert ppx_expect ))
- (libraries containers eio_main eio domainslib base batteries)
- (modules abstractions sems_abs interval_point types tinyest intervals cyclicbarrier interval_tree dpll bloomfilter_rocksdb murmurhash plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant)
+ (preprocess (pps ppx_inline_test ppx_compare ppx_deriving.show ppx_assert ppx_expect ppx_sexp_conv))
+ (libraries core containers eio_main eio domainslib base batteries)
+ (modules intervals dom_signs sems utils stringinttuple sems_abs
+          interval_point types tinyest abstractions cyclicbarrier
+          interval_tree dpll bloomfilter_rocksdb murmurhash
+          plassknuth bloomfilter splaytree splaytree_f rmq btree btree_variant
+; declaration
+; declarationCorrect
+; declarationCorrect4
+; interval
+; intervalNarrowing
+; intervalWidening
+; invariant
+; invariantNarrowing
+; invariantWidening
+; iterator
+; iteratorPartialBoundedTrace
+; iteratorPartialUnboundedTrace
+; iteratorTrace
+; reachability_bounded_trace
+; reachability_bounded
+; reachability_narrowing_bounded_trace
+; reachability_narrowing_bounded
+; reachability_narrowing_declaration_correct_trace
+; reachability_narrowing_declaration_correct
+; reachability_narrowing_declaration_correct4_trace
+; reachability_narrowing_declaration_correct4
+; reachability_narrowing_declaration_trace
+; reachability_narrowing_declaration
+; reachability_narrowing_unbounded_trace
+; reachability_narrowing_unbounded
+; reachability_unbounded_trace
+; reachability_unbounded
+; reachability_unboundedx2
+; reachability_widening_bounded_trace
+; reachability_widening_bounded
+; reachability_widening_trace
+; reachability_widening
+; structural_reachability_narrowing_bounded_trace
+; structural_reachability_narrowing_bounded
+; transformerBounded
+; transformerBounded4
+; transformerUnbounded
+; verifier
+ )
 )

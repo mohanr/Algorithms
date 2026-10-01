@@ -21,9 +21,6 @@ module Make (Ord : ORDERED ) : (IntervalPt with type elt := Ord.value) =
         type value = int
         type inter= Types.inter
         type elt = Ord.value
-   (* Repeated definition. Should belong in types.ml *)
-   (* But interals.ml uses a certain pattern which may *)
-   (* not reuse thie type from types.ml. Should be investigated *)
 
   let eq pt pt1 =
         (* this equates infinity, which should be okay *)
